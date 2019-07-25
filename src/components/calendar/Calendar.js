@@ -2,40 +2,51 @@ import React, { Component } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interaction from "@fullcalendar/interaction";
+import Airtable from "airtable";
 
 import "./Calendar.css";
 import "./main.scss";
 
 class Calendar extends Component {
-  // state = {
-  //   stockPriceData: [],
-  //   addButton: true,
-  //   deleteButton: true
-  // };
-
   state = {
     allEvents: [
-      { id: 1, title: "event 1", date: "2019-07-01" },
-      { id: 2, title: "event 2", date: "2019-07-02" }
-    ]
+      { id: 1, title: 500, date: "2019-07-01", cancelButton: true },
+      { id: 2, title: 350, date: "2019-07-02", cancelButton: true }
+    ],
+    isLoading: true
   };
 
   handleDateClick = arg => {
-    // console.log(arg);
-    // arg.dayEl.style.backgroundColor = "red";
-    this.setState(state => ({
-      allEvents: [...state.allEvents, { title: "event", date: arg.dateStr }]
-    }));
-    // console.log(this.state);
+    let element = arg.dayEl;
+    console.log(arg);
+    let price = prompt("Please enter price of stock");
+    if (price !== null) {
+      if (isNaN(price)) {
+        alert("Must enter a valid number");
+      } else {
+        this.setState({
+          allEvents: [
+            ...this.state.allEvents,
+            {
+              id: 3,
+              title: parseInt(price),
+              date: arg.dateStr,
+              cancelButton: true
+            }
+          ]
+        });
+        element.innerHTML +=
+          "<div style='position:reletive;'><button type='button' id='btnDeleteEvent'>X</button></div>";
+      }
+    }
   };
 
   handleEventClick = arg => {
-    console.log(arg);
-    this.setState(state => ({
-      allEvents: state.allEvents.filter(
-        event => event.title !== arg.event._def.title
+    this.setState({
+      allEvents: this.state.allEvents.filter(
+        a => a.id !== parseInt(arg.event.id)
       )
-    }));
+    });
   };
 
   render() {
