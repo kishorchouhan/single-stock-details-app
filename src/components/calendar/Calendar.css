@@ -1,0 +1,8 @@
+* {
+  box-sizing: border-box;
+}
+
+.calendar {
+  width: 75%;
+  float: left;
+}
