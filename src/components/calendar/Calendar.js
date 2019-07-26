@@ -13,31 +13,25 @@ var base = new Airtable({ apiKey: "keyEZdZTfWR3FMc3E" }).base(
 
 class Calendar extends Component {
   state = {
-    allEvents: [
-      { id: 1, title: 500, date: "2019-07-01", cancelButton: true },
-      { id: 2, title: 350, date: "2019-07-02", cancelButton: true }
-    ],
+    allEvents: [],
     isLoading: true
   };
 
   componentDidMount() {
+    let self = this;
     base("stock data")
       .select({
-        // Selecting the first 3 records in Grid view:
-        maxRecords: 3,
-        view: "Grid view"
+        fields: ["id", "title", "date"],
+        view: "Grid view",
+        sort: [{ field: "id", direction: "asc" }]
       })
       .eachPage(
         function page(records, fetchNextPage) {
-          // This function (`page`) will get called for each page of records.
-
           records.forEach(function(record) {
-            console.log("Retrieved", record.get("id"));
+            self.setState({
+              allEvents: [...self.state.allEvents, record.fields]
+            });
           });
-
-          // To fetch the next page of records, call `fetchNextPage`.
-          // If there are more records, `page` will get called again.
-          // If there are no more records, `done` will get called.
           fetchNextPage();
         },
         function done(err) {
@@ -57,17 +51,31 @@ class Calendar extends Component {
       if (isNaN(price)) {
         alert("Must enter a valid number");
       } else {
-        this.setState({
-          allEvents: [
-            ...this.state.allEvents,
-            {
-              id: 3,
-              title: parseInt(price),
-              date: arg.dateStr,
-              cancelButton: true
+        base("stock data").create(
+          {
+            id: parseInt(arg.dateStr.slice(8)),
+            title: parseInt(price),
+            date: arg.dateStr
+          },
+          function(err, record) {
+            if (err) {
+              console.error(err);
+              return;
             }
-          ]
-        });
+            console.log(record.getId());
+          }
+        );
+
+        // this.setState({
+        //   allEvents: [
+        //     ...this.state.allEvents,
+        //     {
+        //       id: 3,
+        //       title: parseInt(price),
+        //       date: arg.dateStr
+        //     }
+        //   ]
+        // });
         element.innerHTML +=
           "<div style='position:reletive;'><button type='button' id='btnDeleteEvent'>X</button></div>";
       }
